@@ -1,9 +1,7 @@
-const withMarkdoc = require('@markdoc/next.js')
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  pageExtensions: ['js', 'jsx', 'md'],
+  pageExtensions: ['js', 'jsx'],
 
   images: {
     domains: ['ik.imagekit.io', 's3.amazonaws.com'],
@@ -17,4 +15,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withMarkdoc()(nextConfig)
+module.exports = nextConfig

@@ -47,29 +47,14 @@ function collectHeadings(nodes, slugify = slugifyWithCounter()) {
 }
 
 export default function App({ Component, pageProps }) {
-  let title = pageProps.markdoc?.frontmatter.title
+  return (
+    <>
+      <Head>
+        <title>Paz Image and Video Galley</title>
+        <meta name="description" content="Paz Image and Video Gallery" />
+      </Head>
 
-  let pageTitle =
-    pageProps.markdoc?.frontmatter.pageTitle ||
-    `${pageProps.markdoc?.frontmatter.title}`
-
-  let description = pageProps.markdoc?.frontmatter.description
-  let image = pageProps.markdoc?.frontmatter.image
-  let parent = pageProps.markdoc?.frontmatter.parent
-
-  let tableOfContents = pageProps.markdoc?.content
-    ? collectHeadings(pageProps.markdoc.content)
-    : []
-  if (!title) return <Component {...pageProps} />
-  else
-    return (
-      <>
-        <Head>
-          <title>{pageTitle}</title>
-          {description && <meta name="description" content={description} />}
-        </Head>
-
-        <Component {...pageProps} />
-      </>
-    )
+      <Component {...pageProps} />
+    </>
+  )
 }
