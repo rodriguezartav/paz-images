@@ -3,7 +3,11 @@ import React, { useState, useEffect, useRef } from 'react'
 
 import Image from 'next/image'
 
-const urlEndpoint = 'https://ik.imagekit.io/paz/'
+const urlEndpoint = 'https://ik.imagekit.io/paz'
+
+export function createLink(src) {
+  return `${urlEndpoint}/tr:w-300,h-200,fo-auto/${src}`
+}
 
 export function SimpleImage(props) {
   let {

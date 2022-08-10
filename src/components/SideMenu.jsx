@@ -42,15 +42,17 @@ export function SideMenu({ filterImages, selectedItem, orderedFolders }) {
 
           <ul className="mb-8 text-sm font-medium">
             {orderedFolders &&
-              orderedFolders.map((item) => {
-                return (
-                  <FolderItem
-                    onClick={filterImages}
-                    key={item.name}
-                    item={item}
-                  />
-                )
-              })}
+              orderedFolders
+                .filter((item) => item.name.indexOf('_support') == -1)
+                .map((item) => {
+                  return (
+                    <FolderItem
+                      onClick={filterImages}
+                      key={item.name}
+                      item={item}
+                    />
+                  )
+                })}
           </ul>
         </div>
       </nav>

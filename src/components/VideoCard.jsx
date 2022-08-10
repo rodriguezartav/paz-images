@@ -1,6 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/solid'
 import SimpleVideo from './SimpleVideo'
-import SimpleImage from './SimpleImage'
+
+import { downloadResource } from '@/helpers/dowload'
 
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useState } from 'react'
@@ -13,11 +14,6 @@ export function VideoCard(props) {
   const video = props.image
   const [count, setCount] = useState(0)
   const [open, setOpen] = useState(false)
-
-  function setGif() {
-    setUseGif(true)
-    setCount(0)
-  }
 
   function setThumb() {
     setUseGif(false)
@@ -102,7 +98,6 @@ export function VideoCard(props) {
               <button
                 type="button"
                 onClick={() => {
-                  setUseGif(false)
                   if (count > 0) setCount(count - 1)
                 }}
                 className="-m-1.5 flex flex-none items-center justify-center p-1.5  text-gray-400 hover:text-gray-500"
@@ -113,7 +108,6 @@ export function VideoCard(props) {
               <div className="flex-auto font-semibold">{count + 1}</div>
               <button
                 onClick={() => {
-                  setUseGif(false)
                   if (count < 10) setCount(count + 1)
                 }}
                 type="button"
@@ -124,7 +118,10 @@ export function VideoCard(props) {
               </button>
             </div>
 
-            <button className=' bg-indigo-200" flex h-6 w-8 items-center justify-center  rounded-lg border-2 border-white'>
+            <button
+              onClick={() => downloadResource(videoSrc)}
+              className=' bg-indigo-200" flex h-6 w-8 items-center justify-center  rounded-lg border-2 border-white'
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"

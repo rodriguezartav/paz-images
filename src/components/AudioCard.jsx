@@ -1,17 +1,17 @@
-import Link from 'next/link'
-import SimpleImage from './SimpleImage'
-
+import { useState } from 'react'
 import { useFetch } from '../helpers/useFetch'
+
+import { downloadResource } from '@/helpers/dowload'
 
 const s3Endpoint = 'https://s3.amazonaws.com/images.paz.co.cr/'
 
-export function AudioCard({ image }) {
-  const { response } = useFetch(s3Endpoint + 'audios/podcasts/map.json')
-
-  console.log(response)
+export function AudioCard(props) {
+  let audio = props.image
+  let audioSrc =
+    s3Endpoint + `audio_support/${audio.src.replace('audios/', '')}/master.mp3`
 
   return (
-    <div key={image.name} className="w-full p-4 md:w-1/2 lg:w-1/5">
+    <div key={audio.name} className="w-full p-4 md:w-1/2 lg:w-1/5">
       <div className="rounded bg-white p-6">
         <div className="mb-2 flex items-center">
           <span className="mr-3 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-500">
@@ -29,22 +29,27 @@ export function AudioCard({ image }) {
             </svg>
           </span>
           <div>
-            <p className="text-xs font-bold">{image.title}</p>
+            <p className="text-xs font-bold">{audio.title}</p>
           </div>
         </div>
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <audio
-              controls
-              className=" w-full rounded-md"
-              src={s3Endpoint + image.src}
-            />
+            <audio controls className=" w-full rounded-md" src={audioSrc} />
           </div>
 
           <div className="flex items-center">
             <span className="mr-2 inline-block rounded-full bg-indigo-50 py-1 px-2 text-xs text-indigo-500">
-              {image.type}
+              {audio.type}
             </span>
+
+            <a
+              onClick={() => downloadResource(audioSrc)}
+              className={`cursor-pointer text-xs font-medium text-gray-500 ${
+                downloading && 'text-indigo-500'
+              } `}
+            >
+              Download
+            </a>
           </div>
         </div>
       </div>
