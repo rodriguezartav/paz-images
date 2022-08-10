@@ -29,8 +29,7 @@ const stream = require('stream')
 
 export default class S3 {
   constructor(keys) {
-    this.AWS = require('aws-sdk')
-    this.s3 = new this.AWS.S3()
+    this.s3 = new AWS.S3()
   }
 
   get = async function get(bucket, key) {
