@@ -44,9 +44,7 @@ export function AudioCard(props) {
 
             <a
               onClick={() => downloadResource(audioSrc)}
-              className={`cursor-pointer text-xs font-medium text-gray-500 ${
-                downloading && 'text-indigo-500'
-              } `}
+              className={`cursor-pointer text-xs font-medium text-gray-500 `}
             >
               Download
             </a>
