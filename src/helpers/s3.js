@@ -30,6 +30,13 @@ const stream = require('stream')
 export default class S3 {
   constructor(keys) {
     this.s3 = new AWS.S3()
+    this.s3client = new S3Client({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID_,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_,
+      },
+    })
   }
 
   get = async function get(bucket, key) {
@@ -85,13 +92,8 @@ export default class S3 {
   }
 
   getImages = async () => {
-    const client = new S3Client({
-      region: 'us-east-1',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID_,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_,
-      },
-    })
+    const client = this.s3client
+
     let listCommand = new ListObjectsV2Command({
       Bucket: 'images.paz.co.cr',
     })
