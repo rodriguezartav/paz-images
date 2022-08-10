@@ -85,7 +85,13 @@ export default class S3 {
   }
 
   getImages = async () => {
-    const client = new S3Client({ region: 'us-east-1' })
+    const client = new S3Client({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID_,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_,
+      },
+    })
     let listCommand = new ListObjectsV2Command({
       Bucket: 'images.paz.co.cr',
     })
