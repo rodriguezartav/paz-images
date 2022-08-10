@@ -1,6 +1,15 @@
+import Link from 'next/link'
 import SimpleImage from './SimpleImage'
 
+import { useFetch } from '../helpers/useFetch'
+
+const s3Endpoint = 'https://s3.amazonaws.com/images.paz.co.cr/'
+
 export function AudioCard({ image }) {
+  const { response } = useFetch(s3Endpoint + 'audios/podcasts/map.json')
+
+  console.log(response)
+
   return (
     <div key={image.name} className="w-full p-4 md:w-1/2 lg:w-1/5">
       <div className="rounded bg-white p-6">
@@ -25,20 +34,16 @@ export function AudioCard({ image }) {
         </div>
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <SimpleImage
-              className="rounded-md"
-              src={image.src}
-              enableRaw={true}
-              width={200}
+            <audio
+              controls
+              className=" w-full rounded-md"
+              src={s3Endpoint + image.src}
             />
           </div>
 
           <div className="flex items-center">
             <span className="mr-2 inline-block rounded-full bg-indigo-50 py-1 px-2 text-xs text-indigo-500">
               {image.type}
-            </span>
-            <span className="text-xs font-medium text-gray-500">
-              Implementation
             </span>
           </div>
         </div>

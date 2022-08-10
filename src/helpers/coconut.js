@@ -167,3 +167,36 @@ export async function createVersions({ src }) {
     return { error: e }
   }
 }
+
+export async function createAudioVersions({ src }) {
+  const coconut = getCoconut()
+
+  try {
+    let promise = new Promise((resolve, reject) => {
+      {
+        coconut.Job.create(
+          {
+            input: {
+              url: `https://s3.amazonaws.com/images.paz.co.cr/audios/${src}`,
+            },
+            outputs: {
+              'mp3:64k': {
+                path: `/audio_support/${src}/master.mp3`,
+              },
+            },
+          },
+          function (job, err) {
+            if (err) reject(err)
+            else resolve(job)
+          }
+        )
+      }
+    })
+    let result = await promise
+
+    return { result: result }
+  } catch (e) {
+    console.log(e)
+    return { error: e }
+  }
+}
