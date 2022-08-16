@@ -117,8 +117,8 @@ export default class S3 {
 
   getFileObject = function (name, path) {
     let imageObj = {
-      src: name,
-      path: path,
+      src: path,
+      name: name.split('.')[0],
       media_type: 'IMAGE',
       title: name.split('.')[0],
       type: name.split('.')[1],

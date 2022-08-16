@@ -36,8 +36,12 @@ export default function AppIndex() {
   }, [])
 
   useEffect(() => {
-    debugger
-    if (selectedFolder) setFilteredImages(selectedFolder.files)
+    if (
+      selectedFolder &&
+      selectedFolder.files &&
+      selectedFolder.files.length > 0
+    )
+      setFilteredImages(selectedFolder.files)
   }, [selectedFolder])
 
   /*
