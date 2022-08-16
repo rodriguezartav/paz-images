@@ -81,14 +81,61 @@ export default class S3 {
     }
   }
 
-  getFolders = async () => {
-    const pass = new stream.PassThrough()
-    const generator = FolderList({ bucket: 'images.paz.co.cr' })
+  getFolders = async (path) => {
+    let files = await this.getImages()
+    files = files.filter((file) => {
+      return file.src.indexOf('.DS_Store') == -1
+    })
 
-    let folders = await generator.generate('/')
-    let children = folders.children
+    let folders = { home: { name: 'home', children: {}, files: [] } }
 
-    return children
+    files.forEach((file) => {
+      let fileName = getLastPathPart(file.src)
+      let folderName = file.src.replace('/' + fileName, '')
+
+      let parts = folderName.split('/')
+      if (
+        parts[0] == '' ||
+        parts[0] == '/' ||
+        parts[0].indexOf('_support') > -1
+      )
+        return
+
+      let lastFolder = folders.home
+      parts.forEach((part) => {
+        if (part.length > 0) {
+          if (!lastFolder.children[part])
+            lastFolder.children[part] = { name: part, children: {}, files: [] }
+          lastFolder = lastFolder.children[part]
+        }
+      })
+      lastFolder.files.push(this.getFileObject(fileName, file.src))
+    })
+
+    return folders
+  }
+
+  getFileObject = function (name, path) {
+    let imageObj = {
+      src: name,
+      path: path,
+      media_type: 'IMAGE',
+      title: name.split('.')[0],
+      type: name.split('.')[1],
+    }
+
+    if (name.indexOf('.mov') > -1 || name.indexOf('.mp4') > -1)
+      imageObj.media_type = 'VIDEO'
+    if (
+      name.indexOf('.mp3') > -1 ||
+      name.indexOf('.wav') > -1 ||
+      name.indexOf('.m4a') > -1
+    )
+      imageObj.media_type = 'AUDIO'
+
+    if (name.indexOf('.json') > -1) imageObj.media_type = 'MAP'
+
+    return imageObj
   }
 
   getImages = async () => {
@@ -122,9 +169,8 @@ export default class S3 {
     )
 
     return items.map((item) => {
-      const uri = url.parse(URL + '/' + item.Key).href
       let parts = item.Key.split('/')
-      let name = parts.pop().toLowerCase()
+      let name = parts.pop()
 
       let imageObj = {
         src: item.Key,
@@ -141,6 +187,8 @@ export default class S3 {
         name.indexOf('.m4a') > -1
       )
         imageObj.media_type = 'AUDIO'
+
+      if (name.indexOf('.json') > -1) imageObj.media_type = 'MAP'
 
       return imageObj
     })
@@ -168,7 +216,7 @@ function FolderList(options) {
   const lister = s3ls(options)
 
   async function generate(folder, depth) {
-    depth = 6
+    depth = 8
 
     let data = await lister.ls(folder)
 

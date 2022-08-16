@@ -1,26 +1,46 @@
 import Head from 'next/head'
+import MapCardModal from '@/components/MapCardModal'
 
 import { SideMenu } from '@/components/SideMenu'
 
 import { isValidElement, useEffect, useState } from 'react'
 
-import { useFetch } from '@/helpers/useFetch'
+import { useFetch, useMutate } from '@/helpers/useFetch'
 
 import { ImageCard } from '@/components/ImageCard'
 import { AudioCard } from '@/components/AudioCard'
 import { VideoCard } from '@/components/VideoCard'
 
-export default function Home() {
+const s3Endpoint = 'https://s3.amazonaws.com/images.paz.co.cr'
+
+export default function AppIndex() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [checked, setChecked] = useState([])
   const [filteredImages, setFilteredImages] = useState([])
-  const [orderedFolders, setOrderedFolders] = useState([])
-  const [selectedItem, setSelectedItem] = useState()
 
-  let { response: images, isLoading, error } = useFetch(`/api/s3/images`)
+  const [selectedFolder, setSelectedFolder] = useState({
+    name: 'home',
+    path: '/',
+    files: [],
+    children: {},
+  })
 
-  let { response: folders } = useFetch(`/api/s3/folders`)
+  let { mutate: loadFolder, response: folders } = useMutate('/api/s3/folders')
 
+  let { response: mapJson } = useFetch(s3Endpoint + '/map.json')
+
+  let { mutate: mutate } = useMutate('/api/s3/updateMap')
+
+  useEffect(() => {
+    loadFolder({ path: '' })
+  }, [])
+
+  useEffect(() => {
+    debugger
+    if (selectedFolder) setFilteredImages(selectedFolder.files)
+  }, [selectedFolder])
+
+  /*
   useEffect(() => {
     function getLastPathPart(path) {
       path = trimEnd(path, '/')
@@ -37,6 +57,19 @@ export default function Home() {
     return () => {}
   }, [folders])
 
+  */
+
+  function onSave(key, value) {
+    let newMap = {
+      items: { ...mapJson.items, [key]: value },
+    }
+    mutate({
+      bucket: 'images.paz.co.cr',
+      key: '/map.json',
+      body: JSON.stringify(newMap),
+    })
+  }
+
   const trimEnd = (s, ch) =>
     s[s.length - 1] === ch ? trimEnd(s.substr(0, s.length - 1), ch) : s
 
@@ -44,18 +77,6 @@ export default function Home() {
     path = trimEnd(path, '/')
     const lastIndex = path.lastIndexOf('/')
     return path.substr(0, lastIndex + 1)
-  }
-
-  function filterImages(item) {
-    setSelectedItem(item)
-    setFilteredImages(
-      images.filter((image) => {
-        let imagePath = getFirstPathPart(image.src)
-        let path = item.name
-
-        return imagePath == path
-      })
-    )
   }
 
   return (
@@ -94,11 +115,13 @@ export default function Home() {
             </div>
           </nav>
 
-          <SideMenu
-            selectedItem={selectedItem}
-            orderedFolders={orderedFolders}
-            filterImages={filterImages}
-          />
+          {folders && (
+            <SideMenu
+              selectedFolder={selectedFolder}
+              folders={folders['home']}
+              setSelectedFolder={setSelectedFolder}
+            />
+          )}
 
           <div className="mx-auto lg:ml-64">
             <section className="py-8">
@@ -106,12 +129,36 @@ export default function Home() {
                 <div className="-m-4 flex flex-wrap">
                   {filteredImages.map((image, index) => {
                     if (image.media_type == 'IMAGE')
-                      return <ImageCard key={image.name} image={image} />
+                      return (
+                        <ImageCard
+                          mutate={mutate}
+                          map={mapJson}
+                          key={image.name}
+                          image={image}
+                          onSave={onSave}
+                        />
+                      )
                     else if (image.media_type == 'VIDEO')
-                      return <VideoCard key={image.name} image={image} />
+                      return (
+                        <VideoCard
+                          mutate={mutate}
+                          map={mapJson}
+                          key={image.name}
+                          image={image}
+                          onSave={onSave}
+                        />
+                      )
                     else if (image.media_type == 'AUDIO')
-                      return <AudioCard key={image.name} image={image} />
-                    return <></>
+                      return (
+                        <AudioCard
+                          mutate={mutate}
+                          map={mapJson}
+                          key={image.name}
+                          image={image}
+                          onSave={onSave}
+                        />
+                      )
+                    else return <div key={index} />
                   })}
                 </div>
               </div>

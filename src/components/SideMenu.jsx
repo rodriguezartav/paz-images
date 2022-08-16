@@ -1,7 +1,6 @@
 import { isValidElement, useEffect, useState } from 'react'
 
 import SimpleImage from '@/components/SimpleImage'
-import { useFetch } from '@/helpers/useFetch'
 
 export function Logo(props) {
   return (
@@ -22,7 +21,7 @@ export function Logo(props) {
   )
 }
 
-export function SideMenu({ filterImages, selectedItem, orderedFolders }) {
+export function SideMenu({ setSelectedFolder, selectedFolder, folders }) {
   return (
     <div className="navbar-menu relative z-50 hidden lg:block">
       <div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-10 lg:hidden" />
@@ -31,7 +30,7 @@ export function SideMenu({ filterImages, selectedItem, orderedFolders }) {
           <a className="text-xl font-semibold text-white" href="#">
             <Logo className="  inline-block h-16 w-auto" />
             <span className="pt-2 pl-2 uppercase leading-snug">
-              {selectedItem && getLastPathPart(selectedItem.name)}
+              {selectedFolder && selectedFolder.name}
             </span>
           </a>
         </div>
@@ -41,18 +40,16 @@ export function SideMenu({ filterImages, selectedItem, orderedFolders }) {
           </h3>
 
           <ul className="mb-8 text-sm font-medium">
-            {orderedFolders &&
-              orderedFolders
-                .filter((item) => item.name.indexOf('_support') == -1)
-                .map((item) => {
-                  return (
-                    <FolderItem
-                      onClick={filterImages}
-                      key={item.name}
-                      item={item}
-                    />
-                  )
-                })}
+            {folders &&
+              Object.values(folders.children).map((item, index) => {
+                return (
+                  <FolderItem
+                    onClick={setSelectedFolder}
+                    key={item.path + index}
+                    item={item}
+                  />
+                )
+              })}
           </ul>
         </div>
       </nav>
@@ -63,14 +60,14 @@ export function SideMenu({ filterImages, selectedItem, orderedFolders }) {
 function FolderItem({ onClick, item, depth = 1 }) {
   const [open, setOpen] = useState(false)
 
-  let name = getLastPathPart(item.name)
+  let name = item.name
   return (
     <li
       onClick={(e) => {
         e.stopPropagation()
         e.preventDefault()
         onClick(item)
-        if (item.children.length > 0) setOpen(!open)
+        if (Object.keys(item.children).length > 0) setOpen(!open)
       }}
       className={`pl-'${depth * 2}  `}
     >
@@ -96,7 +93,7 @@ function FolderItem({ onClick, item, depth = 1 }) {
         </span>
         <span>{name}</span>
 
-        {item.children.length > 0 && (
+        {Object.keys(item.children).length > 0 && (
           <span className="ml-auto inline-block">
             <svg
               className="h-3 w-3 text-gray-400"
@@ -114,12 +111,12 @@ function FolderItem({ onClick, item, depth = 1 }) {
       </a>
       {open && (
         <ul className={'ml-' + depth * 2}>
-          {item.children.map((subItem) => {
+          {Object.values(item.children).map((subItem, index) => {
             return (
               <FolderItem
                 onClick={onClick}
                 depth={depth + 1}
-                key={name + subItem.name}
+                key={name + subItem.name + index}
                 item={subItem}
               />
             )

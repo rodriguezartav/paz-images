@@ -635,6 +635,5 @@ module.exports = {
     zIndex: ['responsive', 'focus-within', 'focus'],
   },
   corePlugins: {},
-  plugins: [],
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
 }
